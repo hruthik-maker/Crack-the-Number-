@@ -1,0 +1,421 @@
+
+import java.util.Random;
+import java.util.Scanner;
+
+public class NumberGuessingGame {
+
+    static final int MIN = 1;
+    static final int MAX = 100;
+    static final int MAX_ATTEMPTS = 8;
+
+    static Scanner scanner = new Scanner(System.in);
+    static Random random = new Random();
+
+    static int gamesPlayed = 0;
+    static int gamesWon = 0;
+    static int gamesLost = 0;
+    static int totalPoints = 0;
+    static int bestAttempts = Integer.MAX_VALUE;
+
+    public static void main(String[] args) {
+
+        boolean playAgain = true;
+
+        showWelcome();
+
+        while (playAgain) {
+            playGame();
+            playAgain = askPlayAgain();
+        }
+
+        showSessionStats();
+
+        System.out.println("\n====================================");
+        System.out.println(" THANK YOU FOR PLAYING!");
+        System.out.println(" Keep thinking. Keep cracking! 🔐");
+        System.out.println("====================================");
+
+        scanner.close();
+    }
+
+    // Welcome screen
+    static void showWelcome() {
+        System.out.println("\n====================================");
+        System.out.println("      🔐 CRACK THE NUMBER 🔐");
+        System.out.println("     THE ULTIMATE NUMBER MYSTERY");
+        System.out.println("====================================");
+        System.out.println("🕵️ A secret number is waiting...");
+        System.out.println("🎯 Crack the code from 1 to 100.");
+        System.out.println("❤️ You have 8 chances.");
+        System.out.println("🏆 Solve it fast to earn more points!");
+        System.out.println("====================================");
+    }
+
+    // One complete round
+    static void playGame() {
+
+        int secretNumber = random.nextInt(MAX) + MIN;
+        int attempts = 0;
+        boolean hasWon = false;
+
+        gamesPlayed++;
+
+        System.out.println("\n🔎 NEW MISSION STARTED!");
+        System.out.println("The secret number is locked away.");
+        System.out.println("Can you crack it? Let's find out!\n");
+
+        while (attempts < MAX_ATTEMPTS) {
+
+            System.out.print(
+                "🎮 Attempt " + (attempts + 1)
+                + "/" + MAX_ATTEMPTS + " | Your guess: "
+            );
+
+            if (!scanner.hasNextInt()) {
+                System.out.println(
+                    "❌ Invalid input! Enter a whole number.\n"
+                );
+                scanner.next();
+                continue;
+            }
+
+            int guess = scanner.nextInt();
+
+            if (guess < MIN || guess > MAX) {
+                System.out.println(
+                    "🚧 Out of range! Choose a number from 1 to 100.\n"
+                );
+                continue;
+            }
+
+            attempts++;
+
+            // Correct guess
+            if (guess == secretNumber) {
+                hasWon = true;
+                break;
+            }
+
+            // Calculate distance from secret number
+            int distance = Math.abs(guess - secretNumber);
+
+            if (guess > secretNumber) {
+                System.out.println("📈 TOO HIGH! Aim lower!");
+            } else {
+                System.out.println("📉 TOO LOW! Aim higher!");
+            }
+
+            // Hot and cold feedback
+            if (distance <= 3) {
+                System.out.println(
+                    "🔥 BURNING HOT! You're incredibly close!"
+                );
+            } else if (distance <= 7) {
+                System.out.println(
+                    "🌡️ HOT! The secret is within reach!"
+                );
+            } else if (distance <= 15) {
+                System.out.println(
+                    "👀 WARM! Follow your instincts!"
+                );
+            } else if (distance <= 30) {
+                System.out.println(
+                    "🧭 Getting closer. Adjust your strategy!"
+                );
+            } else {
+                System.out.println(
+                    "❄️ ICE COLD! Try a very different number!"
+                );
+            }
+
+            int remaining = MAX_ATTEMPTS - attempts;
+
+            System.out.println(
+                "❤️ Chances remaining: " + remaining
+            );
+
+            if (remaining == 1) {
+                System.out.println(
+                    "\n🚨 FINAL CHANCE ALERT!");
+                System.out.println(
+                    "Everything comes down to your next guess!"
+                );
+                System.out.println(
+                    "🎯 Focus. Think. Crack the code!\n"
+                );
+            } else if (remaining <= 3) {
+                System.out.println(
+                    "⏳ The pressure is rising! Stay sharp!\n"
+                );
+            } else if (remaining > 0) {
+                System.out.println(
+                    "💡 Trust your clues and keep going!\n"
+                );
+            }
+
+            System.out.println("------------------------------------");
+        }
+
+        // End-of-round results
+        if (hasWon) {
+            gamesWon++;
+
+            int points = (MAX_ATTEMPTS - attempts + 1) * 10;
+            totalPoints += points;
+
+            if (attempts < bestAttempts) {
+                bestAttempts = attempts;
+            }
+
+            showVictory(attempts, points);
+            showPlayerRank(attempts);
+        } else {
+            gamesLost++;
+
+            System.out.println("\n====================================");
+            System.out.println("💀 MISSION FAILED!");
+            System.out.println("🔒 The secret number was: "
+                    + secretNumber);
+            System.out.println(
+                "🧩 The mystery escaped this time!"
+            );
+            System.out.println(
+                "🔥 Learn from this round and return stronger!"
+            );
+            System.out.println("====================================");
+        }
+
+        // Special number event
+        showSecretNumberEvent(secretNumber);
+
+        System.out.println("\n📊 CURRENT SESSION");
+        System.out.println("Games played: " + gamesPlayed);
+        System.out.println("Victories: " + gamesWon);
+        System.out.println("Total points: " + totalPoints);
+    }
+
+    // Unique celebration for each winning attempt
+    static void showVictory(int attempts, int points) {
+
+        System.out.println("\n====================================");
+        System.out.println("       🔓 CODE CRACKED! 🔓");
+        System.out.println("====================================");
+
+        switch (attempts) {
+            case 1:
+                System.out.println("⚡ LEGENDARY INSTINCT!");
+                System.out.println(
+                    "ONE SHOT! ONE VICTORY! ABSOLUTE LEGEND!"
+                );
+                break;
+
+            case 2:
+                System.out.println("🧠 GENIUS DETECTED!");
+                System.out.println(
+                    "Two tries! Your brain is unstoppable!"
+                );
+                break;
+
+            case 3:
+                System.out.println("🔥 NUMBER HUNTER!");
+                System.out.println(
+                    "You tracked down the mystery like a pro!"
+                );
+                break;
+
+            case 4:
+                System.out.println("🎯 SHARP SHOOTER!");
+                System.out.println(
+                    "Your precision is on another level!"
+                );
+                break;
+
+            case 5:
+                System.out.println("🕵️ MYSTERY SOLVED!");
+                System.out.println(
+                    "The secret couldn't hide from you!"
+                );
+                break;
+
+            case 6:
+                System.out.println("💪 NEVER GIVE UP!");
+                System.out.println(
+                    "Patience and determination win the day!"
+                );
+                break;
+
+            case 7:
+                System.out.println("😱 DOWN TO THE WIRE!");
+                System.out.println(
+                    "You survived the pressure and conquered it!"
+                );
+                break;
+
+            case 8:
+                System.out.println("👑 LAST-CHANCE CHAMPION!");
+                System.out.println(
+                    "THE FINAL GUESS! THE EPIC VICTORY!"
+                );
+                break;
+        }
+
+        System.out.println("🏆 Attempts used: " + attempts);
+        System.out.println("⭐ Points earned: " + points);
+        System.out.println("====================================");
+    }
+
+    // Rank based on how quickly the player wins
+    static void showPlayerRank(int attempts) {
+
+        System.out.println("\n🏅 YOUR PLAYER RANK");
+
+        if (attempts <= 2) {
+            System.out.println("👑 NUMBER LEGEND");
+            System.out.println(
+                "You possess extraordinary guessing instincts!"
+            );
+        } else if (attempts <= 4) {
+            System.out.println("🧠 MASTERMIND");
+            System.out.println(
+                "Your logic and strategy are impressive!"
+            );
+        } else if (attempts <= 6) {
+            System.out.println("🕵️ DETECTIVE");
+            System.out.println(
+                "You followed the clues and cracked the case!"
+            );
+        } else {
+            System.out.println("🎮 ROOKIE CHAMPION");
+            System.out.println(
+                "You made it! Now aim for a faster victory!"
+            );
+        }
+    }
+
+    // Unique messages for special secret numbers
+    static void showSecretNumberEvent(int number) {
+
+        String message = "";
+
+        switch (number) {
+            case 7:
+                message =
+                    "🍀 LUCKY SEVEN! A legendary number of fortune!";
+                break;
+
+            case 13:
+                message =
+                    "👻 NUMBER 13! The mysterious number has appeared!";
+                break;
+
+            case 42:
+                message =
+                    "🌌 THE ANSWER TO LIFE, THE UNIVERSE, AND EVERYTHING!";
+                break;
+
+            case 50:
+                message =
+                    "🎉 HALF-CENTURY MILESTONE! Right in the middle!";
+                break;
+
+            case 77:
+                message =
+                    "✨ DOUBLE SEVEN! A rare and lucky combination!";
+                break;
+
+            case 99:
+                message =
+                    "💯 ALMOST A HUNDRED! One of the highest numbers!";
+                break;
+
+            case 100:
+                message =
+                    "💯 CENTURY CLUB! THE MAXIMUM NUMBER!";
+                break;
+
+            default:
+                break;
+        }
+
+        if (!message.isEmpty()) {
+            System.out.println("\n🎁 SPECIAL NUMBER EVENT!");
+            System.out.println(message);
+        }
+    }
+
+    // Ask whether the player wants another round
+    static boolean askPlayAgain() {
+
+        while (true) {
+            System.out.print(
+                "\n🔄 Ready for another mission? (Y/N): "
+            );
+
+            String answer = scanner.next().trim();
+
+            if (answer.equalsIgnoreCase("Y")
+                    || answer.equalsIgnoreCase("YES")) {
+                System.out.println(
+                    "\n🔥 NEW ROUND! YOUR NEXT VICTORY AWAITS!"
+                );
+                return true;
+            }
+
+            if (answer.equalsIgnoreCase("N")
+                    || answer.equalsIgnoreCase("NO")) {
+                return false;
+            }
+
+            System.out.println(
+                "❌ Please enter Y or N."
+            );
+        }
+    }
+
+    // Final statistics for the entire session
+    static void showSessionStats() {
+
+        double winRate = gamesPlayed == 0
+                ? 0.0
+                : (gamesWon * 100.0) / gamesPlayed;
+
+        System.out.println("\n====================================");
+        System.out.println("       📊 MISSION SUMMARY");
+        System.out.println("====================================");
+        System.out.println("🎮 Total games: " + gamesPlayed);
+        System.out.println("🏆 Victories: " + gamesWon);
+        System.out.println("💀 Defeats: " + gamesLost);
+        System.out.printf("🎯 Win rate: %.1f%%%n", winRate);
+        System.out.println("⭐ Total points: " + totalPoints);
+
+        if (bestAttempts != Integer.MAX_VALUE) {
+            System.out.println(
+                "⚡ Best victory: " + bestAttempts + " attempt(s)"
+            );
+        } else {
+            System.out.println(
+                "⚡ Best victory: Not achieved yet"
+            );
+        }
+
+        if (gamesWon == gamesPlayed && gamesPlayed > 0) {
+            System.out.println(
+                "👑 PERFECT SESSION! YOU ARE A NUMBER LEGEND!"
+            );
+        } else if (gamesWon > gamesLost) {
+            System.out.println(
+                "🔥 Excellent performance! Keep dominating!"
+            );
+        } else if (gamesWon == 0) {
+            System.out.println(
+                "💪 Every expert starts somewhere. Try again!"
+            );
+        } else {
+            System.out.println(
+                "🚀 Keep practicing. Your next record awaits!"
+            );
+        }
+
+        System.out.println("====================================");
+    }
+}
